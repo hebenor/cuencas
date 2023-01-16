@@ -14,6 +14,7 @@ library(tidyverse)
 library(here)
 library(readr)
 library(knitr)
+library(kableExtra)
 
 ```
 
@@ -26,15 +27,25 @@ datos <- read_csv(here("datos_cuencas.csv"))
 ```{r}
 #Se hace el cálculo de la medida 1 que se calcula como ele_corr/elementos.
 
-datos %>% 
+m1 <- datos %>% 
   mutate(datos, m1 = signif(ele_corr/elementos, digits = 3)) %>% 
-  summarise(m1_media = round(mean(m1),3),
-            m1_mediana = median(m1),
-            m1_max = max(m1),
-            m1_min = min(m1)) %>% 
-  kable()
+  summarise(m1_media = round(mean(m1), 3),
+            m1_mediana = round(median(m1), 3),
+            m1_max = round(max(m1), 3),
+            m1_min = round(min(m1), 3))
 
+kable(m1, booktabs = TRUE, col.names = c("Media","Mediana","Máximo", "Mínimo"))
 
+require(knitr)
+require(kableExtra)
+m1 %>% 
+  kable(booktabs = TRUE, 
+        format = "latex") %>% 
+  kable_styling(
+    latex_options = c("striped", "condensed"),
+    position = "center",
+    full_width = FALSE
+  )
 
 ```
 
