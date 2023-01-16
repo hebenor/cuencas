@@ -3,52 +3,202 @@ title: "Informe_calidad_cuencas"
 author: "Hebenor Bermudez CI: 2.796.603-1"
 date: "2023-01-16"
 output: pdf_document
+
 ---
+
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
 ```
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 library(tidyverse)
 library(here)
 library(readr)
 library(knitr)
 library(kableExtra)
+library(xtable)
 
 ```
 
-```{r}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 
 #Se cargan los datos a partir del archivo de google.
 datos <- read_csv(here("datos_cuencas.csv"))
+
+tabla01 <- read_csv(here("d_cuencas.csv"))
+```
+# MATERIALES
+
+Los datos a estudiar se obtienen de los geoservicios WFS de la IDEUy. Los geoservicios utilizados son:
+
+- Hidrografía nacional (IDEUY-Hidrología): Eje curso de agua. 
+- Hidrografía nacional (IDEUY-Hidrología): Eje canal.
+- Cuencas hidrográficas: cn_cuencas_uy_10k.
+
+Para todo el proceso de análisis de los datos se utiliza el sofware SIG de escritorio QGIS.
+
+# ÁMBITO
+
+El ámbito de evaluación es el territorio cubierto por la capa de cuencas de la IDEUy.
+
+
+# ASPECTOS A EVALUAR POR CUENCA
+
+Los aspectos a evaluar son los siguientes, los cuales se pueden dividir en 4 grupos:
+
+## Conceptuales
+- L1: elementos que son seleccionados pero que no pertenecen a la cuenca.
+- L2: elementos que quedan por fuera de los límites de la cuenca.
+- L4: elementos que deberían pertenecer al conjunto de datos de ejes de canal.
+
+## Generales
+- G1: Continuidad en el atributo nombre: todos los elementos que componen un curso de agua con nombre y solo estos elementos tienen como atributo el nombre del curso de agua.
+- G2: Elementos menores a 2,50 metros entre objetos de igual codificación en todos sus atributos: Considerando el criterio de ¼ de milímetro como elemento menor distinguible a la escala establecida para estos datos se define que todos los elementos menores a 2,5 metros de longitud no deberían incluirse en la base.
+- G3: No deben existir valores de los atributos omitidos.
+- G5: Continuidad en el atributo hyc.
+
+
+## Topológicos
+- T1: Conexión topológica entre elementos de la red de drenaje.
+- T2: Sentido de escurrimiento coincidente con el sentido de digitalización.
+
+## Globales
+- GL1: Funcionamiento general de la red coincidiendo el sentido de digitalización con el de escurrimiento.
+- GL2: Funcionamiento general de la red coincidiendo el sentido de digitalización con el de escurrimiento y considerando tolerancia en la conexión de los elementos.
+- GL3: Funcionamiento general de la red con el sentido de digitalización no necesariamente coincidiendo con el de escurrimiento.
+- GL4: Funcionamiento general de la red con el sentido de digitalización no necesariamente coincidiendo con el de escurrimiento y considerando tolerancia en la conexión de los elementos.
+
+# MEDIDAS DE LA CALIDAD
+
+Acá van las medidas una a una
+
+# PROCEDIMIENTO PARA LA GENERACIÓN DE DATOS
+
+Debido a la gran cantidad de instancias que componen el conjunto de datos de ejes de cursos de agua se trabaja con conglomerados definidos por las cuencas, las que se seleccionan de forma aleatoria.
+
+El conjunto de datos de cuencas que crea la IDEUy establece 8 niveles. Para hacer la evaluación se seleccionan las cuencas de los niveles 4 a 8 de forma que cada porción del territorio solo sea cubierta por un elemento.Para la evaluación de la calidad se eligen al azar el 5 % de las cuencas teniendo como resultado 273 cuencas y sobre ellas se estudian todos los elementos del conjunto de datos eje de cursos de agua que surjen de una selección espacial entre los límites de la cuenca y los ejes de cursos de agua. Los elementos que se inspeccionan son las instancias de la capa eje de curso de agua.
+
+
+Esto resulta en un total de 5456 cuencas que cubren la mayor parte del territorio nacional, distribuidas segun el nivel al que pertenecen lo que se ve indicado en la Tabla \ref{tab:tablar1}.
+
+
+
+```{r tablar1, echo=FALSE, warning=FALSE, message=FALSE}
+require(knitr)
+require(kableExtra)
+tabla01 %>% 
+  kable(booktabs = TRUE,
+        format = "latex", 
+        caption = "\\label{tablar1}Cantidad de cuencas y tamano muestral") %>% 
+  kable_styling(
+    latex_options = c("striped","condensed", "HOLD_position"),
+    position = "center",
+    full_width = FALSE
+  )
 ```
 
-```{r}
+Para recabar la información se sigue el siguiente procedimiento:
+
+1. El primer paso consiste en crear un archivo shapefile con los ejes que pertenecen a la cuenca a estudiar. Para esto con la herramienta *Herramientas de investigación -> Selección por localización* se seleccionan los elementos del WFS de la IDEUy *hidrografia:eje_curso_de_agua_l* que se intersectan con la cuenca a estudiar. Todos los elementos que surgen de esta selección se estudian en las distintas fases de análisis.
+
+2. Se analizan los elementos seleccionados para detectar los errores lógicos definidos. Son elementos extraños:
+  - Elemento que no pertenece a la cuenca.
+  - Elemento que debería ser parte de la cuenca y no lo es.
+  - Elemento que se conecta a un canal (si bien no son considerados como un error no son usados en la evaluación de los aspectos generales de la cuenca).
+  - Elemento que es parte de un canal.
+
+3. Los elementos detectados que no pertenecen a la cuenca o pertenece a un canal son marcados con un atributo en la tabla. Para las evaluaciones posteriores estos elementos son filtrados del conjunto de datos a evaluar.
+
+4. Para evaluar el error G1 se clasifica la red de la cuenca por el campo nam y se analiza visualmente su corrección.
+
+5. Para evaluar el error G2 se crea un campo en la tabla de los ejes y se calcula la longitud de cada elemento mediante la función de geometría *$length*. Se trabaja con dos lugares decimales y en el sistema de coordenadas de la capa.
+
+6. Para evaluar el error G3 se verifican los campos de la tabla excepto nam ya que en el caso de este atributo no corresponde que todos los elementos tengan nombre.
+
+7. Para evaluar el error G5 se clasifica la capa de ejes por el campo hyc. Luego visualmente se observa que haya continuidad en este atributo en los ejes. En caso de que no haya continuidad entre los valores 6 y 8 se clasifica el error como G5-1. También se indican como error los elementos clasificados como 0.
+
+8. Para el error T1 se aplica la herramienta Comprobador de Topología y se configura la condición de que no haya extremos sueltos. Con esto se identifican los elementos que pudieran tener extremos sueltos cuando en realidad no corresponde que sea así.
+
+9. Para evaluar los errores globales de la red se filtran los elementos que fueron detectados en el paso 2. Con la herramienta NetworkGT se crea la red y se analizan los nodos de la misma. De esto se extraen el número de extremos y de intersecciones para los cálculos. Luego de generada la red con la herramienta *Análisis de redes -> Ruta más corta (capa a punto)* se analiza la red en los distintos escenarios.
+
+Se descartan las cuencas que por su poca cantidad de elementos o su gran cantidad de instancias del objeto canal puedan desvirtuar los valores de la evaluación.
+
+Para cada una de las cuencas se realiza el cálculo de cada una de las medidas indicadas y se analizan estos resultados. 
+
+# RESULTADOS
+
+Luego de procesadas las cuencas seleccionadas se realiza la evaluación a 203 descartando 70 por distintos motivos. Estas 203 cuencas corresponden al 3,72% del total de las cuencas que forman el universo de los datos a evaluar.
+
+Como primeros datos y como resultado extra de la avaluación resulta que 28 de las cuencas estudiadas presentan elementos con algún problema de conexión a la red general. Esto se deber principalmente a mala conexión entre elementos o a falta de elementos que impiden la conexión.
+
+Por otro lado pero en menor cantidad se detectaron algunas cuencas con elementos duplicados, loops, errores en la clasificación, etc. Estos problema se detectaron en 11 de las cuencas evaluadas.
+
+
+## Medida 1 - Índice de cumplimiento de las reglas del esquema conceptual.
+
+Del cálculo de la medida 1 se puede ver que solo en 53 cuencas, que representan un 26,11% de las cuencas estudiadas, se seleccionan correctamente los elementos de los cursos de agua. Por lo que aproximadamente el 75% de la cuencas selecciones objetos de mas al momento de hacer una selección espacial. En la tabla \ref{tab:tabla01} se puede ver un resumen de los valores obtenidos para esta medida.
+
+```{r tabla01, echo=FALSE, warning=FALSE, message=FALSE}
 #Se hace el cálculo de la medida 1 que se calcula como ele_corr/elementos.
 
-m1 <- datos %>% 
-  mutate(datos, m1 = signif(ele_corr/elementos, digits = 3)) %>% 
-  summarise(m1_media = round(mean(m1), 3),
-            m1_mediana = round(median(m1), 3),
-            m1_max = round(max(m1), 3),
-            m1_min = round(min(m1), 3))
+datos <- datos %>% 
+  mutate(m1 = signif(ele_corr/elementos, digits = 3)) 
 
-kable(m1, booktabs = TRUE, col.names = c("Media","Mediana","Máximo", "Mínimo"))
+
+m1_resumen <- datos %>% 
+  summarise(m1_media = mean(m1),
+            m1_mediana = median(m1),
+            m1_max = max(m1),
+            m1_min = min(m1),
+            m1_de = sqrt(var(m1)))
+
+m1_cant <- datos %>% 
+  mutate(datos, m1 = signif(ele_corr/elementos, digits = 3)) %>% 
+  filter(m1 == 1) %>% 
+ summarise(prueba = n())
+  
+
 
 require(knitr)
 require(kableExtra)
-m1 %>% 
-  kable(booktabs = TRUE, 
-        format = "latex") %>% 
+m1_resumen %>% 
+  kable(booktabs = TRUE,
+        format = "latex", 
+        col.names = c("Media", "Mediana", "Máximo", "Mínimo", "Desviación Estándar"), 
+        caption = "\\label{tabla01}Resumen de la medida 1", 
+        digits = 3) %>% 
   kable_styling(
-    latex_options = c("striped", "condensed"),
+    latex_options = c("striped","condensed", "HOLD_position"),
     position = "center",
     full_width = FALSE
   )
 
 ```
+ 
+```{r}
 
+```
 
-## R Markdown
+ 
+ 
+  
+## Medida 2 - Índice de incumplimiento de las reglas del esquema conceptual.
+
+```{r tabla02, echo=FALSE, warning=FALSE, message=FALSE}
+
+datos <- datos %>% 
+  mutate(m2 = signif(l2/elementos, digits = 3)) 
+
+m2_resumen <- datos %>% 
+  summarise(m2_media = mean(m2),
+            m2_mediana = median(m2),
+            m2_max = max(m2),
+            m2_min = min(m2),
+            m2_de = sqrt(var(m2)))
+
+```
+
 
