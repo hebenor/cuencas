@@ -139,24 +139,26 @@ Por otro lado pero en menor cantidad se detectaron algunas cuencas con elementos
 
 ## Medida 1 - Índice de cumplimiento de las reglas del esquema conceptual.
 
-Del cálculo de la medida 1 se puede ver que solo en 53 cuencas, que representan un 26,11% de las cuencas estudiadas, se seleccionan correctamente los elementos de los cursos de agua. Por lo que aproximadamente el 75% de la cuencas selecciones objetos de mas al momento de hacer una selección espacial. En la tabla \ref{tab:tabla01} se puede ver un resumen de los valores obtenidos para esta medida.
+Del cálculo de la medida 1 se puede ver que solo en 53 cuencas, que representan un 26,11% de las cuencas estudiadas, se seleccionan correctamente los elementos de los cursos de agua. Por lo que aproximadamente el 75% de la cuencas selecciones objetos de mas al momento de hacer una selección espacial. 
+
+En la tabla \ref{tab:tabla01} se puede ver un resumen de los valores obtenidos para esta medida. Si bien el rango de los valores es de aproximadamente un 11% tanto la media como la mediana están por encima de 99%. Se puede ver en el histrograma para los valores de la medida (gráfico \ref[fig:grafico1]) la mayor parte de los valores se presentan a partir del 98%, pudiendo considerarse los restantes valores como atípicos.
 
 ```{r tabla01, echo=FALSE, warning=FALSE, message=FALSE}
 #Se hace el cálculo de la medida 1 que se calcula como ele_corr/elementos.
 
 datos <- datos %>% 
-  mutate(m1 = signif(ele_corr/elementos, digits = 3)) 
+  mutate(m1 = signif((ele_corr/elementos)*100, digits = 4)) 
 
 
 m1_resumen <- datos %>% 
-  summarise(m1_media = mean(m1),
-            m1_mediana = median(m1),
-            m1_max = max(m1),
-            m1_min = min(m1),
-            m1_de = sqrt(var(m1)))
+  summarise(m1_media = signif(mean(m1), digits = 4),
+            m1_mediana = signif(median(m1), digits = 4),
+            m1_max = signif(max(m1), digits = 5),
+            m1_min = signif(min(m1), digits = 4),
+            m1_de = signif(sqrt(var(m1)), digits = 3))
 
 m1_cant <- datos %>% 
-  mutate(datos, m1 = signif(ele_corr/elementos, digits = 3)) %>% 
+  mutate(datos, m1 = signif(ele_corr/elementos, digits = 4)) %>% 
   filter(m1 == 1) %>% 
  summarise(prueba = n())
   
@@ -178,9 +180,12 @@ m1_resumen %>%
 
 ```
  
-```{r}
-
+```{r grafico1, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Histograma de la medida 1"}
+datos %>% 
+  ggplot(aes(m1)) + geom_histogram()
 ```
+ 
+
 
  
  
