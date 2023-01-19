@@ -2,8 +2,9 @@
 title: "Informe_calidad_cuencas"
 author: "Hebenor Bermudez CI: 2.796.603-1"
 date: "2023-01-16"
-output: pdf_document
-
+output:  bookdown::pdf_document2
+toc: true
+toc_depth: 3
 ---
 
 
@@ -30,6 +31,8 @@ datos <- read_csv(here("datos_cuencas.csv"))
 
 tabla01 <- read_csv(here("d_cuencas.csv"))
 ```
+\pagebreak
+
 # MATERIALES
 
 Los datos a estudiar se obtienen de los geoservicios WFS de la IDEUy. Los geoservicios utilizados son:
@@ -136,40 +139,46 @@ Como primeros datos y como resultado extra de la avaluación resulta que 28 de l
 
 Por otro lado pero en menor cantidad se detectaron algunas cuencas con elementos duplicados, loops, errores en la clasificación, etc. Estos problema se detectaron en 11 de las cuencas evaluadas.
 
+## Aspectos conceptuales
 
-## Medida 1 - Índice de cumplimiento de las reglas del esquema conceptual.
+### Medida 1 - Índice de cumplimiento de las reglas del esquema conceptual.
 
-Del cálculo de la medida 1 se puede ver que solo en 53 cuencas, que representan un 26,11% de las cuencas estudiadas, se seleccionan correctamente los elementos de los cursos de agua. Por lo que aproximadamente el 75% de la cuencas selecciones objetos de mas al momento de hacer una selección espacial. 
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+datos <- datos %>% 
+  mutate(m1 = signif((ele_corr/elementos)*100, digits = 6)) 
+```
 
-En la tabla \ref{tab:tabla01} se puede ver un resumen de los valores obtenidos para esta medida. Si bien el rango de los valores es de aproximadamente un 11% tanto la media como la mediana están por encima de 99%. Se puede ver en el histrograma para los valores de la medida (gráfico \ref[fig:grafico1]) la mayor parte de los valores se presentan a partir del 98%, pudiendo considerarse los restantes valores como atípicos.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+m1_cant <- datos %>% 
+  select(m1) %>% 
+  filter(m1 == 100) %>% 
+ summarise(prueba = n(),
+           porcentaje = signif((prueba/203)*100, digits = 4))
+```
+
+
+Del cálculo de la medida 1 se puede ver que solo en  `r m1_cant[1]` cuencas, que representan un `r m1_cant[2]`% de las cuencas estudiadas, se seleccionan correctamente los elementos de los cursos de agua. Por lo que en aproximadamente el 75% de la cuencas se seleccionan objetos de mas al momento de hacer una selección espacial. 
+
+
 
 ```{r tabla01, echo=FALSE, warning=FALSE, message=FALSE}
 #Se hace el cálculo de la medida 1 que se calcula como ele_corr/elementos.
-
-datos <- datos %>% 
-  mutate(m1 = signif((ele_corr/elementos)*100, digits = 4)) 
-
 
 m1_resumen <- datos %>% 
   summarise(m1_media = signif(mean(m1), digits = 4),
             m1_mediana = signif(median(m1), digits = 4),
             m1_max = signif(max(m1), digits = 5),
             m1_min = signif(min(m1), digits = 4),
+            m1_rango = (m1_max-m1_min),
             m1_de = signif(sqrt(var(m1)), digits = 3))
-
-m1_cant <- datos %>% 
-  mutate(datos, m1 = signif(ele_corr/elementos, digits = 4)) %>% 
-  filter(m1 == 1) %>% 
- summarise(prueba = n())
-  
-
 
 require(knitr)
 require(kableExtra)
 m1_resumen %>% 
   kable(booktabs = TRUE,
         format = "latex", 
-        col.names = c("Media", "Mediana", "Máximo", "Mínimo", "Desviación Estándar"), 
+        col.names = c("Media", "Mediana", "Máximo", "Mínimo", "Rango", "Desviación Estándar"), 
         caption = "\\label{tabla01}Resumen de la medida 1", 
         digits = 3) %>% 
   kable_styling(
@@ -180,30 +189,244 @@ m1_resumen %>%
 
 ```
  
-```{r grafico1, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Histograma de la medida 1"}
+En la tabla \ref{tab:tabla01} se puede ver un resumen de los valores obtenidos para esta medida. Si bien el rango de los valores es de `r m1_resumen[5]`% tanto la media como la mediana están por encima de 99%. Se puede ver en el histrograma para los valores de la medida (gráfico \ref{fig:grafico1}) que la mayor parte de los valores se presentan a partir del 98%, pudiendo considerarse los restantes valores como atípicos.
+ 
+```{r grafico1, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Histograma del porcentaje de elementos correctamente seleccionados por cuenca estudiada"}
 datos %>% 
-  ggplot(aes(m1)) + geom_histogram()
+  ggplot(aes(m1)) + 
+  geom_histogram(fill = "tomato1", color ="grey28") +
+  scale_x_continuous(name ="Porcentaje de instancias") +
+  scale_y_continuous(name = "Cantidad")
 ```
  
 
+### Medida 2 - Índice de incumplimiento de las reglas del esquema conceptual.
 
- 
- 
-  
-## Medida 2 - Índice de incumplimiento de las reglas del esquema conceptual.
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+datos <- datos %>% 
+  mutate(m2 = signif((l2/elementos)*100, digits = 3)) 
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+m2_cant <- datos %>% 
+  select(m2) %>% 
+  filter(m2 == 0) %>% 
+ summarise(prueba = n(),
+           porcentaje = signif((prueba/203)*100, digits = 2))
+```
+
+
+Esta medida indica la cantidad de elementos que pertenecen a la cuenca pero que no son seleccionados en el procedimiento. Para esta medida `r m2_cant[1]` cuencas no presentan instancias con estas características, lo que representa un `r m2_cant[2]`% de las cuencas evaluadas.
+
 
 ```{r tabla02, echo=FALSE, warning=FALSE, message=FALSE}
 
-datos <- datos %>% 
-  mutate(m2 = signif(l2/elementos, digits = 3)) 
-
 m2_resumen <- datos %>% 
-  summarise(m2_media = mean(m2),
-            m2_mediana = median(m2),
-            m2_max = max(m2),
-            m2_min = min(m2),
-            m2_de = sqrt(var(m2)))
+  summarise(m2_media = signif(mean(m2), digits = 2),
+            m2_mediana = signif(median(m2), digits = 4),
+            m2_max = signif(max(m2), digits = 5),
+            m2_min = signif(min(m2), digits = 4),
+            m2_rango = (m2_max-m2_min),
+            m2_de = signif(sqrt(var(m2)), digits = 3))
+
+
+require(knitr)
+require(kableExtra)
+m2_resumen %>% 
+  kable(booktabs = TRUE,
+        format = "latex", 
+        col.names = c("Media", "Mediana", "Máximo", "Mínimo", "Rango", "Desviación Estándar"), 
+        caption = "\\label{tabla02}Resumen de la medida 2", 
+        digits = 3) %>% 
+  kable_styling(
+    latex_options = c("striped","condensed", "HOLD_position"),
+    position = "center",
+    full_width = FALSE
+  )
 
 ```
+
+Como se puede ver en la tabla \ref{tab:tabla02}, la mediana de los valores es `r m2_resumen[2]`0 y la media es `r m2_resumen[1]`% lo que muestra valores muy bajos si bien se presenta un valor extremo de `r m2_resumen[3]`%. En el grafico \ref{fig:grafico2} se puede apreciar que gran parte de los valores para esta medida son menores a 2,5% presentando nuevamente valores atípicos.
+
+```{r grafico2, echo=FALSE, warning=FALSE, message=FALSE, fig.cap= "Porcentaje de elementos que no son seleccionados pero que deberían serlo"}
+datos %>% 
+  ggplot(aes(m2)) + 
+  geom_histogram(fill = "tomato1", color ="grey28") +
+  scale_x_continuous(name ="Porcentaje de instancias") +
+  scale_y_continuous(name = "Cantidad")
+```
+
+
+### Medida 3 - Índice de ítems excedentes.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+datos <- datos %>% 
+  mutate(m3 = signif((l4/ele_corr)*100, digits = 3)) 
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+m3_cant <- datos %>% 
+  select(m3) %>% 
+  filter(m3 == 0) %>% 
+ summarise(prueba = n(),
+           porcentaje = signif((prueba/203)*100, digits = 4))
+```
+
+Durante el estudio de las cuencas se detectaron instancias que si bien se incluyeron en el conjunto de datos de ejes de cursos de agua deberían de haber pertenecidos a la capa de ejes de canales. Esta medida muestra la influencia de esto en la selección de elementos. Para esta medida en `r m3_cant[1]` cuencas no se detectaron elementos lo que representa el `r m3_cant[2]`% de las cuencas estudiadas.
+
+
+```{r tabla03, echo=FALSE, warning=FALSE, message=FALSE}
+m3_resumen <- datos %>% 
+  summarise(m3_media = signif(mean(m3), digits = 2),
+            m3_mediana = signif(median(m3), digits = 4),
+            m3_max = signif(max(m3), digits = 5),
+            m3_min = signif(min(m3), digits = 4),
+            m3_rango = (m3_max-m3_min),
+            m3_de = signif(sqrt(var(m3)), digits = 2))
+
+
+require(knitr)
+require(kableExtra)
+m3_resumen %>% 
+  kable(booktabs = TRUE,
+        format = "latex", 
+        col.names = c("Media", "Mediana", "Máximo", "Mínimo", "Rango", "Desviación Estándar"), 
+        caption = "\\label{tabla03}Resumen de la medida 3", 
+        digits = 3) %>% 
+  kable_styling(
+    latex_options = c("striped","condensed", "HOLD_position"),
+    position = "center",
+    full_width = FALSE
+  )
+
+```
+
+Como en el caso de la medida 2, esta medida presenta valores bajos. La mediana tiene una valor de `r m3_resumen[2]`% y la media de `r m3_resumen[1]` como se puede ver en la tabla \ref{tab:tabla03}. Como se confirma en el grafico \ref{fig:grafico3}, la barra correspondiente al primer intervalo es notoriamente mayor que las restantes.
+
+```{r grafico3, echo=FALSE, warning=FALSE, message=FALSE, fig.cap= "Histograma del porcentaje de elementos comitidos por pertenecer a otro conjunto de datos"}
+datos %>% 
+  ggplot(aes(m3)) + 
+  geom_histogram(fill = "tomato1", color ="grey28") +
+  scale_x_continuous(name ="Porcentaje de instancias") +
+  scale_y_continuous(name = "Cantidad")
+```
+
+## Aspectos generales
+
+### Medida 4 - Índice de elementos omitidos
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+datos <- datos %>% 
+  mutate(m4 = signif(((ele_corr-g1)/ele_corr)*100, digits = 6)) 
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+m5_cant <- datos %>% 
+  select(m4) %>% 
+  filter(m4 == 100) %>% 
+ summarise(prueba = n(),
+           porcentaje = signif((prueba/203)*100, digits = 4))
+```
+
+```{r tabla04, echo=FALSE, warning=FALSE, message=FALSE}
+m4_resumen <- datos %>% 
+  summarise(m4_media = signif(mean(m4), digits = 4),
+            m4_mediana = signif(median(m4), digits = 4),
+            m4_max = signif(max(m4), digits = 5),
+            m4_min = signif(min(m4), digits = 4),
+            m4_rango = (m4_max-m4_min),
+            m4_de = signif(sqrt(var(m4)), digits = 2))
+
+
+require(knitr)
+require(kableExtra)
+m4_resumen %>% 
+  kable(booktabs = TRUE,
+        format = "latex", 
+        col.names = c("Media", "Mediana", "Máximo", "Mínimo", "Rango", "Desviación Estándar"), 
+        caption = "\\label{tabla04}Resumen de la medida 4", 
+        digits = 3) %>% 
+  kable_styling(
+    latex_options = c("striped","condensed", "HOLD_position"),
+    position = "center",
+    full_width = FALSE
+  )
+
+```
+
+
+```{r grafico4, echo=FALSE, warning=FALSE, message=FALSE, fig.cap= "Histograma del porcentaje de elementos con valores ausentes en el campo correspondiente al nombre del curso de agua"}
+datos %>% 
+  ggplot(aes(m4)) + 
+  geom_histogram(fill = "tomato1", color ="grey28") +
+  scale_x_continuous(name ="Porcentaje de instancias") +
+  scale_y_continuous(name = "Cantidad")
+```
+
+### Medida 5 - Índice de elementos omitidos
+
+```{r, , echo=FALSE, warning=FALSE, message=FALSE}
+datos <- datos %>% 
+  mutate(m5 = signif(((ele_corr-g2)/ele_corr)*100, digits = 6)) 
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+m5_cant <- datos %>% 
+  select(m5) %>% 
+  filter(m5 == 100) %>% 
+ summarise(prueba = n(),
+           porcentaje = signif((prueba/203)*100, digits = 4))
+```
+
+```{r tabla05, echo=FALSE, warning=FALSE, message=FALSE}
+m5_resumen <- datos %>% 
+  summarise(m5_media = signif(mean(m5), digits = 4),
+            m5_mediana = signif(median(m5), digits = 4),
+            m5_max = signif(max(m5), digits = 5),
+            m5_min = signif(min(m5), digits = 4),
+            m5_rango = (m5_max-m5_min),
+            m5_de = signif(sqrt(var(m5)), digits = 2))
+
+
+require(knitr)
+require(kableExtra)
+m5_resumen %>% 
+  kable(booktabs = TRUE,
+        format = "latex", 
+        col.names = c("Media", "Mediana", "Máximo", "Mínimo", "Rango", "Desviación Estándar"), 
+        caption = "\\label{tabla04}Resumen de la medida 5", 
+        digits = 3) %>% 
+  kable_styling(
+    latex_options = c("striped","condensed", "HOLD_position"),
+    position = "center",
+    full_width = FALSE
+  )
+
+```
+
+```{r grafico5, echo=FALSE, warning=FALSE, message=FALSE, fig.cap= "Histograma del porcentaje de elementos cuya longitud es menor a 2,50 metros"}
+datos %>% 
+  ggplot(aes(m5)) + 
+  geom_histogram(fill = "tomato1", color ="grey28") +
+  scale_x_continuous(name ="Porcentaje de instancias") +
+  scale_y_continuous(name = "Cantidad")
+```
+
+
+### Medida 6 - Índice de elementos omitidos
+
+```{r, , echo=FALSE, warning=FALSE, message=FALSE}
+datos <- datos %>% 
+  mutate(m6 = signif((g3/ele_corr)*100, digits = 6)) 
+```
+
+
+
+
+
+
+
 
 
