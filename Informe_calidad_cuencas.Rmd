@@ -117,7 +117,8 @@ m2 %>%
   kable_styling(
     latex_options = c("striped","condensed", "HOLD_position"),
     position = "center",
-    full_width = TRUE
+    full_width = TRUE,
+    wraptable_width = "1pt"
   )
 
 ```
