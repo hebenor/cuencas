@@ -30,6 +30,8 @@ library(xtable)
 datos <- read_csv(here("datos_cuencas.csv"))
 
 tabla01 <- read_csv(here("d_cuencas.csv"))
+
+medidas <- read_csv(here("medidas.csv"))
 ```
 \pagebreak
 
@@ -77,6 +79,52 @@ Los aspectos a evaluar son los siguientes, los cuales se pueden dividir en 4 gru
 # MEDIDAS DE LA CALIDAD
 
 Acá van las medidas una a una
+
+```{r tablam1, echo=FALSE, warning=FALSE, message=FALSE}
+
+m1 <- data.frame(medidas[,1],medidas[,2]) 
+colnames(m1) <- c("CARACTERÍSTICA","DESCRIPCIÓN")
+  
+
+require(knitr)
+require(kableExtra)
+m1 %>% 
+  kable(booktabs = TRUE,
+        format = "latex", 
+        caption = "\\label{tablam1}Medida 1") %>% 
+  kable_styling(
+    latex_options = c("striped","condensed", "HOLD_position"),
+    position = "center",
+    full_width = TRUE
+  )
+
+```
+
+
+
+```{r tablam2, echo=FALSE, warning=FALSE, message=FALSE}
+
+m2 <- data.frame (medidas[,1], medidas[,3]) 
+colnames(m2) <- c("CARACTERÍSTICA","DESCRIPCIÓN")
+  
+
+require(knitr)
+require(kableExtra)
+m2 %>% 
+  kable(booktabs = TRUE,
+        format = "latex", 
+        caption = "\\label{tablam2}Medida 2") %>% 
+  kable_styling(
+    latex_options = c("striped","condensed", "HOLD_position"),
+    position = "center",
+    full_width = TRUE
+  )
+
+```
+
+
+
+
 
 # PROCEDIMIENTO PARA LA GENERACIÓN DE DATOS
 
@@ -316,6 +364,9 @@ datos %>%
 ## Aspectos generales
 
 ### Medida 4 - Índice de elementos omitidos
+
+Esta medida brinda la proporción de elementos a los que se les asigno mal el valor al atributo nombre. En este caso, no a todos los elementos le corresponde que se le asigne un nombre ya que no todos los cursos de agua tienen nombre. Esta medida presenta valores altos de cumplimiento ya que la gran mayoría de cuencas se encuentran por encima del 99% de elementos correctos.
+
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 datos <- datos %>% 
@@ -719,6 +770,14 @@ datos %>%
   scale_y_continuous(name = "Cantidad")
 ```
 
+## Medidas generales
+
+Se plantea la realización de medidas generales que abarquen aspectos de uso de forma conjunta. Se definen 3 medidas de generalización de los resultados:
+
+- Conceptual: resume las medidas L1, L2 y L3
+- General: resume las medidas G1, G2, G3 y G5
+- Topológicas: resume las medidas T1, T2 y GL1
+
 
 ## Resumen
 
@@ -729,7 +788,7 @@ datos <- datos %>%
 ```
 
 
-```{r grafico12, echo=FALSE, warning=FALSE, message=FALSE, fig.cap= "Histograma del porcentaje de elementos que escurren de acuerdo al criterio 3"}
+```{r grafico13, echo=FALSE, warning=FALSE, message=FALSE, fig.cap= "Histograma del porcentaje de elementos que escurren de acuerdo al criterio 3"}
 datos %>% 
   ggplot(aes(resumen1)) + 
   geom_histogram(fill = "tomato1", color ="grey28") +
