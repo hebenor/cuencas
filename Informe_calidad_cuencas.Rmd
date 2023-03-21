@@ -50,35 +50,40 @@ Para todo el proceso de análisis de los datos se utiliza el sofware SIG de escr
 El ámbito de evaluación es el territorio cubierto por la capa de cuencas de la IDEUy.
 
 
-# ASPECTOS A EVALUAR POR CUENCA
+# DATOS A RECABAR
 
-Los aspectos a evaluar son los siguientes, los cuales se pueden dividir en 4 grupos:
+Los datos a recabar son los siguientes, los cuales se pueden dividir en 4 grupos:
 
-## Conceptuales
-- L1: elementos que son seleccionados pero que no pertenecen a la cuenca.
-- L2: elementos que quedan por fuera de los límites de la cuenca.
-- L4: elementos que deberían pertenecer al conjunto de datos de ejes de canal.
+## Globales
+- GL1: Cantidad de elementos de ejes de cursos de agua que son seleccionados.
+- GL2: Cantidad de elementos de ejes de cursos de agua correctamente seleccionados (GL1-GL5-GL8).
+- GL3: Cantidad de extremos de la red.
+- GL4: Cantidad de intersecciones de la red.
+- GL5: Cantidad de elementos que son seleccionados pero que no pertenecen a la cuenca.
+- GL6: Cantidad de elementos que quedan por fuera de los límites de la cuenca.
+- GL7: Cantidad de elementos que se conectan a un canal pero que pertenecen a la red.
+- GL8: Cantidad de elementos que deberían pertenecer al conjunto de datos de ejes de canal.
 
 ## Generales
-- G1: Continuidad en el atributo nombre: todos los elementos que componen un curso de agua con nombre y solo estos elementos tienen como atributo el nombre del curso de agua.
-- G2: Elementos menores a 2,50 metros entre objetos de igual codificación en todos sus atributos: Considerando el criterio de ¼ de milímetro como elemento menor distinguible a la escala establecida para estos datos se define que todos los elementos menores a 2,5 metros de longitud no deberían incluirse en la base.
-- G3: No deben existir valores de los atributos omitidos.
-- G5: Continuidad en el atributo hyc.
+- G1: Cantidad de elementos con el atributo nam incorrecto.
+- G2: Cantidad de elementos cuya longitud es menor a 2,50 metros (se considera el criterio de ¼ de milímetro como elemento menor distinguible a la escala establecida).
+- G3: Cantidad de atributos omitidos.
+- G5: Cantidad de discontinuidades incorrectas en el atributo hyc.
 
 
 ## Topológicos
-- T1: Conexión topológica entre elementos de la red de drenaje.
-- T2: Sentido de escurrimiento coincidente con el sentido de digitalización.
+- T1: Cantidad de conexiones erróneas entre elementos de la red de drenaje.
+- T2: Cantidad de elementos cuyo escurrimiento no coincidente con el sentido de digitalización.
 
-## Globales
-- GL1: Funcionamiento general de la red coincidiendo el sentido de digitalización con el de escurrimiento.
-- GL2: Funcionamiento general de la red coincidiendo el sentido de digitalización con el de escurrimiento y considerando tolerancia en la conexión de los elementos.
-- GL3: Funcionamiento general de la red con el sentido de digitalización no necesariamente coincidiendo con el de escurrimiento.
-- GL4: Funcionamiento general de la red con el sentido de digitalización no necesariamente coincidiendo con el de escurrimiento y considerando tolerancia en la conexión de los elementos.
+## Funcionamiento de la red
+- F1: Cantidad de extremos que conectan con el punto de salida de la red considerando el sentido de digitalización con el de escurrimiento.
+- F2: Cantidad de extremos que conectan con el punto de salida de la red considerando el sentido de digitalización con el de escurrimiento y una tolerancia en la conexión de los elementos de 0,1 metros.
+- F3: Cantidad de extremos que conectan con el punto de salida de la red considerando que el sentido de digitalización no necesariamente coincide con el de escurrimiento.
+- F4: Cantidad de extremos que conectan con el punto de salida de la red considerando que el sentido de digitalización no necesariamente coincide con el de escurrimiento y una tolerancia en la conexión de los elementos de 0,1 metros.
 
 # MEDIDAS DE LA CALIDAD
 
-Acá van las medidas una a una
+Listado de medidas utilizadas para medir la calidad del conjunto de datos.
 
 ```{r tablam1, echo=FALSE, warning=FALSE, message=FALSE}
 
@@ -123,8 +128,209 @@ m2 %>%
 
 ```
 
+```{r tablam3, echo=FALSE, warning=FALSE, message=FALSE}
+
+m3 <- data.frame (medidas[,1], medidas[,4]) 
+colnames(m3) <- c("CARACTERÍSTICA","DESCRIPCIÓN")
+  
+
+require(knitr)
+require(kableExtra)
+m3 %>% 
+  kable(booktabs = TRUE,
+        format = "latex", 
+        caption = "\\label{tablam3}Medida 3") %>% 
+  kable_styling(
+    latex_options = c("striped","condensed", "HOLD_position"),
+    position = "center",
+    full_width = TRUE,
+    wraptable_width = "1pt"
+  )
+```
+
+```{r tablam4, echo=FALSE, warning=FALSE, message=FALSE}
+
+m4 <- data.frame (medidas[,1], medidas[,5]) 
+colnames(m4) <- c("CARACTERÍSTICA","DESCRIPCIÓN")
+  
+
+require(knitr)
+require(kableExtra)
+m4 %>% 
+  kable(booktabs = TRUE,
+        format = "latex", 
+        caption = "\\label{tablam4}Medida 4") %>% 
+  kable_styling(
+    latex_options = c("striped","condensed", "HOLD_position"),
+    position = "center",
+    full_width = TRUE,
+    wraptable_width = "1pt"
+  )
+```
+
+```{r tablam5, echo=FALSE, warning=FALSE, message=FALSE}
+
+m5 <- data.frame (medidas[,1], medidas[,6]) 
+colnames(m5) <- c("CARACTERÍSTICA","DESCRIPCIÓN")
+  
+
+require(knitr)
+require(kableExtra)
+m5 %>% 
+  kable(booktabs = TRUE,
+        format = "latex", 
+        caption = "\\label{tablam5}Medida 5") %>% 
+  kable_styling(
+    latex_options = c("striped","condensed", "HOLD_position"),
+    position = "center",
+    full_width = TRUE,
+    wraptable_width = "1pt"
+  )
+```
+
+```{r tablam6, echo=FALSE, warning=FALSE, message=FALSE}
+
+m6 <- data.frame (medidas[,1], medidas[,7]) 
+colnames(m6) <- c("CARACTERÍSTICA","DESCRIPCIÓN")
+  
+
+require(knitr)
+require(kableExtra)
+m6 %>% 
+  kable(booktabs = TRUE,
+        format = "latex", 
+        caption = "\\label{tablam6}Medida 6") %>% 
+  kable_styling(
+    latex_options = c("striped","condensed", "HOLD_position"),
+    position = "center",
+    full_width = TRUE,
+    wraptable_width = "1pt"
+  )
+```
 
 
+```{r tablam8, echo=FALSE, warning=FALSE, message=FALSE}
+
+m8 <- data.frame (medidas[,1], medidas[,8]) 
+colnames(m8) <- c("CARACTERÍSTICA","DESCRIPCIÓN")
+  
+
+require(knitr)
+require(kableExtra)
+m8 %>% 
+  kable(booktabs = TRUE,
+        format = "latex", 
+        caption = "\\label{tablam8}Medida 8") %>% 
+  kable_styling(
+    latex_options = c("striped","condensed", "HOLD_position"),
+    position = "center",
+    full_width = TRUE,
+    wraptable_width = "1pt"
+  )
+```
+
+```{r tablam9, echo=FALSE, warning=FALSE, message=FALSE}
+
+m9 <- data.frame (medidas[,1], medidas[,9]) 
+colnames(m9) <- c("CARACTERÍSTICA","DESCRIPCIÓN")
+  
+
+require(knitr)
+require(kableExtra)
+m9 %>% 
+  kable(booktabs = TRUE,
+        format = "latex", 
+        caption = "\\label{tablam9}Medida 9") %>% 
+  kable_styling(
+    latex_options = c("striped","condensed", "HOLD_position"),
+    position = "center",
+    full_width = TRUE,
+    wraptable_width = "1pt"
+  )
+```
+
+```{r tablam10, echo=FALSE, warning=FALSE, message=FALSE}
+
+m10 <- data.frame (medidas[,1], medidas[,10]) 
+colnames(m10) <- c("CARACTERÍSTICA","DESCRIPCIÓN")
+  
+
+require(knitr)
+require(kableExtra)
+m10 %>% 
+  kable(booktabs = TRUE,
+        format = "latex", 
+        caption = "\\label{tablam10}Medida 10") %>% 
+  kable_styling(
+    latex_options = c("striped","condensed", "HOLD_position"),
+    position = "center",
+    full_width = TRUE,
+    wraptable_width = "1pt"
+  )
+```
+
+```{r tablam11, echo=FALSE, warning=FALSE, message=FALSE}
+
+m11 <- data.frame (medidas[,1], medidas[,11]) 
+colnames(m11) <- c("CARACTERÍSTICA","DESCRIPCIÓN")
+  
+
+require(knitr)
+require(kableExtra)
+m11 %>% 
+  kable(booktabs = TRUE,
+        format = "latex", 
+        caption = "\\label{tablam11}Medida 11") %>% 
+  kable_styling(
+    latex_options = c("striped","condensed", "HOLD_position"),
+    position = "center",
+    full_width = TRUE,
+    wraptable_width = "1pt"
+  )
+```
+
+```{r tablam12, echo=FALSE, warning=FALSE, message=FALSE}
+
+m12 <- data.frame (medidas[,1], medidas[,12]) 
+colnames(m12) <- c("CARACTERÍSTICA","DESCRIPCIÓN")
+  
+
+require(knitr)
+require(kableExtra)
+m12 %>% 
+  kable(booktabs = TRUE,
+        format = "latex", 
+        caption = "\\label{tablam12}Medida 12") %>% 
+  kable_styling(
+    latex_options = c("striped","condensed", "HOLD_position"),
+    position = "center",
+    full_width = TRUE,
+    wraptable_width = "1pt"
+  )
+```
+
+
+```{r tablam13, echo=FALSE, warning=FALSE, message=FALSE}
+
+m13 <- data.frame (medidas[,1], medidas[,13]) 
+colnames(m13) <- c("CARACTERÍSTICA","DESCRIPCIÓN")
+  
+
+require(knitr)
+require(kableExtra)
+m13 %>% 
+  kable(booktabs = TRUE,
+        format = "latex", 
+        caption = "\\label{tablam13}Medida 13") %>% 
+  kable_styling(
+    latex_options = c("striped","condensed", "HOLD_position"),
+    position = "center",
+    full_width = TRUE,
+    wraptable_width = "1pt"
+  )
+```
+
+\pagebreak
 
 
 # PROCEDIMIENTO PARA LA GENERACIÓN DE DATOS
@@ -180,6 +386,8 @@ Se descartan las cuencas que por su poca cantidad de elementos o su gran cantida
 
 Para cada una de las cuencas se realiza el cálculo de cada una de las medidas indicadas y se analizan estos resultados. 
 
+\pagebreak
+
 # RESULTADOS
 
 Luego de procesadas las cuencas seleccionadas se realiza la evaluación a 203 descartando 70 por distintos motivos. Estas 203 cuencas corresponden al 3,72% del total de las cuencas que forman el universo de los datos a evaluar.
@@ -194,7 +402,7 @@ Por otro lado pero en menor cantidad se detectaron algunas cuencas con elementos
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 datos <- datos %>% 
-  mutate(m1 = signif((ele_corr/elementos)*100, digits = 6)) 
+  mutate(m1 = signif((gl2/gl1)*100, digits = 6)) 
 ```
 
 
@@ -253,7 +461,7 @@ datos %>%
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 datos <- datos %>% 
-  mutate(m2 = signif((l2/elementos)*100, digits = 3)) 
+  mutate(m2 = signif((gl6/gl1)*100, digits = 3))
 ```
 
 
@@ -311,7 +519,7 @@ datos %>%
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 datos <- datos %>% 
-  mutate(m3 = signif((l4/ele_corr)*100, digits = 3)) 
+  mutate(m3 = signif((gl8/gl2)*100, digits = 3)) 
 ```
 
 
@@ -371,7 +579,7 @@ Esta medida brinda la proporción de elementos a los que se les asigno mal el va
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 datos <- datos %>% 
-  mutate(m4 = signif(((ele_corr-g1)/ele_corr)*100, digits = 6)) 
+  mutate(m4 = signif(((gl2-g1)/gl2)*100, digits = 6)) 
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -421,7 +629,7 @@ datos %>%
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 datos <- datos %>% 
-  mutate(m5 = signif(((ele_corr-g2)/ele_corr)*100, digits = 6)) 
+  mutate(m5 = signif(((gl2-g2)/gl2)*100, digits = 6)) 
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -471,7 +679,7 @@ datos %>%
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 datos <- datos %>% 
-  mutate(m6 = signif((g3/ele_corr)*100, digits = 6)) 
+  mutate(m6 = signif((g3/gl2)*100, digits = 6)) 
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -529,7 +737,7 @@ Es el caso del atributo hyd que aún hay que analizar bien cual es la medida.
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 datos <- datos %>% 
-  mutate(m8 = signif((t1/intersecc)*100, digits = 6)) 
+  mutate(m8 = signif((t1/gl4)*100, digits = 6)) 
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -579,7 +787,7 @@ datos %>%
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 datos <- datos %>% 
-  mutate(m9 = signif(((ele_corr-t2)/ele_corr)*100, digits = 6)) 
+  mutate(m9 = signif(((gl2-t2)/gl2)*100, digits = 6)) 
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -630,7 +838,7 @@ datos %>%
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 datos <- datos %>% 
-  mutate(m10 = signif(((extremos-gl1)/extremos)*100, digits = 6)) 
+  mutate(m10 = signif(((gl3-f1)/gl3)*100, digits = 6)) 
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -678,7 +886,7 @@ datos %>%
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 datos <- datos %>% 
-  mutate(m11 = signif(((extremos-gl2)/extremos)*100, digits = 6)) 
+  mutate(m11 = signif(((gl3-f2)/gl3)*100, digits = 6)) 
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -727,7 +935,7 @@ datos %>%
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 datos <- datos %>% 
-  mutate(m12 = signif(((extremos-gl3)/extremos)*100, digits = 6)) 
+  mutate(m12 = signif(((gl3-f3)/gl3)*100, digits = 6)) 
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -771,13 +979,20 @@ datos %>%
   scale_y_continuous(name = "Cantidad")
 ```
 
+
+### Medida 13 - Índice de conexión 4
+
+Los resultados para esta medida no se presentan ya que con la condición establecida para determinar la misma no falla la conexión de ninguno de los extremos con la salida de la cuenca.
+
+\pagebreak
+
 ## Medidas generales
 
 Se plantea la realización de medidas generales que abarquen aspectos de uso de forma conjunta. Se definen 3 medidas de generalización de los resultados:
 
-- Conceptual: resume las medidas L1, L2 y L3
-- General: resume las medidas G1, G2, G3 y G5
-- Topológicas: resume las medidas T1, T2 y GL1
+- Conceptual: resume las medidas 1, 2 y 3.
+- General: resume las medidas 4, 5, 6 y 7.
+- Topológicas: resume las medidas 8, 9 y 10.
 
 
 ## Resumen
