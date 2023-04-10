@@ -1000,13 +1000,21 @@ Se plantea la realización de medidas generales que abarquen aspectos de uso de 
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 datos <- datos %>% 
-  mutate(resumen1 = signif((m1/100)+((100-m2)/100)+((100-m3)/100)+(m4/100)+(m5/100)+(m6/100)+((100-m8)/100)+(m9/100)+(m10/100), digits = 5)) 
+  mutate(conceptual = signif(((m1/100)+((100-m2)/100)+((100-m3)/100))/0.03, digits = 5)) 
 ```
+
+
+```{r}
+datos <- datos %>% 
+  mutate(general = signif((m4+m5+m6)/3, digits = 5)) 
+```
+
+
 
 
 ```{r grafico13, echo=FALSE, warning=FALSE, message=FALSE, fig.cap= "Histograma del porcentaje de elementos que escurren de acuerdo al criterio 3"}
 datos %>% 
-  ggplot(aes(resumen1)) + 
+  ggplot(aes(conceptual)) + 
   geom_histogram(fill = "tomato1", color ="grey28") +
   scale_x_continuous(name ="Porcentaje de instancias") +
   scale_y_continuous(name = "Cantidad")
